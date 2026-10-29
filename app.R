@@ -610,15 +610,15 @@ server <- function(input, output, session) {
     )
 
     slice_colors <- c(
-      Protein = "#3867D6",
-      Fat = "#D79A00",
-      Carbohydrates = "#27AE60"
+      Protein = "#111111",
+      Fat = "#8A8A8A",
+      Carbohydrates = "#D9D9D9"
     )
 
     label_colors <- c(
       Protein = "#FFFFFF",
-      Fat = "#1F2933",
-      Carbohydrates = "#FFFFFF"
+      Fat = "#111111",
+      Carbohydrates = "#111111"
     )
 
     par(mar = c(1, 1, 2, 1), bg = "white")
