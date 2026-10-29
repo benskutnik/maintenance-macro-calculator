@@ -2,7 +2,7 @@
 # Single-file Shiny app using maintenance-only nutrition-dashboard logic.
 
 library(shiny)
-library(shinythemes)
+library(bslib)
 
 # ---------- Calculation helpers ----------
 
@@ -194,7 +194,16 @@ info_panel <- function(title, ...) {
 # ---------- UI ----------
 
 ui <- fluidPage(
-  theme = shinytheme("lumen"),
+  theme = bs_theme(
+    version = 5,
+    bg = "#FFFFFF",
+    fg = "#111111",
+    primary = "#111111",
+    base_font = font_collection(
+      "system-ui", "-apple-system", "Segoe UI", "Roboto",
+      "Helvetica Neue", "Arial", "sans-serif"
+    )
+  ),
 
   tags$head(
     tags$style(HTML("\n      body { background-color: #f7f8fa; }\n      .well { background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }\n      .hero-result { background: #ffffff; border: 1px solid #dfe3e8; border-radius: 16px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }\n      .hero-label { color: #5f6b7a; font-size: 15px; margin-bottom: 6px; }\n      .hero-value { color: #1f2933; font-size: 44px; font-weight: 700; line-height: 1.05; }\n      .hero-subtext { color: #5f6b7a; font-size: 15px; margin-top: 8px; }\n      .macro-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-height: 116px; }\n      .macro-label { color: #5f6b7a; font-size: 14px; margin-bottom: 6px; }\n      .macro-value { color: #1f2933; font-size: 30px; font-weight: 700; line-height: 1.1; }\n      .macro-subtext { color: #5f6b7a; font-size: 14px; margin-top: 6px; }\n      .details-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-top: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-height: 430px; }\n      .chart-note { color: #5f6b7a; font-size: 13px; margin-top: 10px; }\n      .form-note { color: #5f6b7a; font-size: 13px; }\n      h3, h4 { color: #1f2933; }\n      table { background-color: #ffffff; }\n    "))
