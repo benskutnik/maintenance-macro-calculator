@@ -4,6 +4,9 @@
 library(shiny)
 library(bslib)
 
+# Footer link. Change it here when the site moves to benskutnik.com.
+site_url <- "https://benskutnik.ghost.io/?ref=macro-calculator"
+
 # ---------- Calculation helpers ----------
 
 convert_height_to_cm <- function(unit_system, height_ft = NA, height_in_extra = NA, height_cm = NA) {
@@ -208,7 +211,7 @@ ui <- fluidPage(
   tags$head(
     tags$link(rel = "icon", href = "favicon-48.png"),
     tags$link(rel = "apple-touch-icon", href = "apple-touch-icon.png"),
-    tags$style(HTML("\n      body { background-color: #f5f5f5; }\n      .well { background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }\n      .hero-result { background: #ffffff; border: 1px solid #dfe3e8; border-radius: 16px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }\n      .hero-label { color: #666666; font-size: 15px; margin-bottom: 6px; }\n      .hero-value { color: #111111; font-size: 44px; font-weight: 700; line-height: 1.05; }\n      .hero-subtext { color: #666666; font-size: 15px; margin-top: 8px; }\n      .macro-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-height: 116px; }\n      .macro-label { color: #666666; font-size: 14px; margin-bottom: 6px; }\n      .macro-value { color: #111111; font-size: 30px; font-weight: 700; line-height: 1.1; }\n      .macro-subtext { color: #666666; font-size: 14px; margin-top: 6px; }\n      .details-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-top: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }\n      .chart-note { color: #666666; font-size: 13px; margin-top: 10px; }\n      .form-note { color: #666666; font-size: 13px; }\n      h3, h4 { color: #111111; }\n      table { background-color: #ffffff; }\n    "))
+    tags$style(HTML("\n      body { background-color: #f5f5f5; }\n      .well { background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }\n      .hero-result { background: #ffffff; border: 1px solid #dfe3e8; border-radius: 16px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }\n      .hero-label { color: #666666; font-size: 15px; margin-bottom: 6px; }\n      .hero-value { color: #111111; font-size: 44px; font-weight: 700; line-height: 1.05; }\n      .hero-subtext { color: #666666; font-size: 15px; margin-top: 8px; }\n      .macro-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-height: 116px; }\n      .macro-label { color: #666666; font-size: 14px; margin-bottom: 6px; }\n      .macro-value { color: #111111; font-size: 30px; font-weight: 700; line-height: 1.1; }\n      .macro-subtext { color: #666666; font-size: 14px; margin-top: 6px; }\n      .details-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-top: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }\n      .chart-note { color: #666666; font-size: 13px; margin-top: 10px; }\n      .form-note { color: #666666; font-size: 13px; }\n      h3, h4 { color: #111111; }\n      table { background-color: #ffffff; }\n      .site-footer { margin: 40px 0 24px; text-align: center; font-size: 13px; }\n      .site-footer a { display: inline-flex; align-items: center; gap: 8px; color: #666666; text-decoration: none; }\n      .site-footer a:hover { color: #111111; }\n    "))
   ),
 
   titlePanel("Maintenance Calorie and Macronutrient Calculator"),
@@ -397,6 +400,16 @@ ui <- fluidPage(
           )
         )
       )
+    )
+  ),
+
+  tags$footer(
+    class = "site-footer",
+    tags$a(
+      href = site_url,
+      target = "_blank",
+      tags$img(src = "ben-skutnik-logo-light.svg", alt = "", height = 24),
+      "Made by Ben Skutnik"
     )
   )
 )
