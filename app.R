@@ -591,7 +591,9 @@ server <- function(input, output, session) {
   })
 
   output$results_table <- renderTable({
-    results()$detail_table
+    details <- results()$detail_table
+    names(details) <- c("Metric", "Value")
+    details
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
   output$macro_pie_chart <- renderPlot({
