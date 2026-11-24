@@ -3,9 +3,19 @@
 
 library(shiny)
 library(bslib)
+library(tibble)
+library(glue)
+library(scales)
+library(purrr)
 
 # Footer link.
 site_url <- "https://benskutnik.com/?ref=macro-calculator"
+
+# Whole numbers with commas, such as 2,950.
+format_number <- label_comma(accuracy = 1)
+
+# One color per macronutrient, used in the targets table and the bar.
+macro_colors <- c(Protein = "#111111", Fat = "#8A8A8A", Carbohydrates = "#D9D9D9")
 
 # ---------- Calculation helpers ----------
 
@@ -144,26 +154,27 @@ calculate_maintenance_targets <- function(
   fat_kcal <- fat_g * 9
   carb_kcal <- carb_g * 4
 
-  detail_table <- data.frame(
+  fat_free_mass_text <- if (is.na(rmr_result$fat_free_mass_kg)) {
+    "Not used"
+  } else {
+    glue("{round(rmr_result$fat_free_mass_kg, 1)} kg")
+  }
+
+  detail_table <- tibble(
     metric = c(
       "Height",
       "Weight",
       "Fat-free mass",
-      "RMR",
-      "Protein calories",
-      "Fat calories",
-      "Carbohydrate calories"
+      glue("Resting metabolic rate ({rmr_result$method})"),
+      "Activity multiplier"
     ),
     value = c(
-      paste0(round(height_cm_final, 1), " cm"),
-      paste0(round(weight_kg_final, 1), " kg"),
-      ifelse(is.na(rmr_result$fat_free_mass_kg), "Not used", paste0(round(rmr_result$fat_free_mass_kg, 1), " kg")),
-      paste0(round(rmr_result$rmr), " kcal/day"),
-      paste0(round(protein_kcal), " kcal"),
-      paste0(round(fat_kcal), " kcal"),
-      paste0(round(carb_kcal), " kcal")
-    ),
-    stringsAsFactors = FALSE
+      glue("{round(height_cm_final, 1)} cm"),
+      glue("{round(weight_kg_final, 1)} kg"),
+      fat_free_mass_text,
+      glue("{format_number(rmr_result$rmr)} kcal/day"),
+      glue("{adjusted_multiplier} ({base_multiplier} daily activity + {training_bump} training)")
+    )
   )
 
   list(
@@ -202,23 +213,30 @@ ui <- fluidPage(
     bg = "#FFFFFF",
     fg = "#111111",
     primary = "#6D2838",
+    # Franklin Gothic URW from the benskutnik.com Adobe Fonts web project,
+    # loaded in tags$head() below. The system fonts are the fallback.
     base_font = font_collection(
-      "system-ui", "-apple-system", "Segoe UI", "Roboto",
+      "franklin-gothic-urw", "system-ui", "-apple-system", "Segoe UI",
       "Helvetica Neue", "Arial", "sans-serif"
-    )
+    ),
+    "headings-font-weight" = 700,
+    "border-radius" = "0",
+    "border-radius-sm" = "0",
+    "border-radius-lg" = "0"
   ),
 
   tags$head(
     tags$link(rel = "icon", href = "favicon-48.png"),
     tags$link(rel = "apple-touch-icon", href = "apple-touch-icon.png"),
-    tags$style(HTML("\n      body { background-color: #f4f4f4; }\n      .well { background-color: #ffffff; border: 1px solid #e6e8eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }\n      .hero-result { background: #ffffff; border: 1px solid #dfe3e8; border-radius: 16px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }\n      .hero-label { color: #666666; font-size: 15px; margin-bottom: 6px; }\n      .hero-value { color: #111111; font-size: 44px; font-weight: 700; line-height: 1.05; }\n      .hero-subtext { color: #666666; font-size: 15px; margin-top: 8px; }\n      .macro-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-height: 116px; }\n      .macro-label { color: #666666; font-size: 14px; margin-bottom: 6px; }\n      .macro-value { color: #111111; font-size: 30px; font-weight: 700; line-height: 1.1; }\n      .macro-subtext { color: #666666; font-size: 14px; margin-top: 6px; }\n      .details-card { background: #ffffff; border: 1px solid #e6e8eb; border-radius: 14px; padding: 18px; margin-top: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }\n      .chart-note { color: #666666; font-size: 13px; margin-top: 10px; }\n      .form-note { color: #666666; font-size: 13px; }\n      h3, h4 { color: #111111; }\n      table { background-color: #ffffff; }\n      .site-footer { margin: 40px 0 24px; text-align: center; font-size: 13px; }\n      .site-footer a { display: inline-flex; align-items: center; gap: 8px; color: #666666; text-decoration: none; }\n      .site-footer a:hover { color: #111111; }\n    "))
+    tags$link(rel = "stylesheet", href = "https://use.typekit.net/lvf3qiv.css"),
+    tags$link(rel = "stylesheet", href = "styles.css")
   ),
 
-  titlePanel("Maintenance Calorie and Macronutrient Calculator"),
+  titlePanel("Maintenance calorie and macronutrient calculator"),
 
   tabsetPanel(
     tabPanel(
-      "Start Here",
+      "Start here",
       br(),
       fluidRow(
         column(
@@ -338,66 +356,27 @@ ui <- fluidPage(
             selected = "Medium"
           ),
 
-          helpText("See the Start Here tab for definitions and calculation notes."),
+          helpText("See the Start here tab for definitions and calculation notes."),
           helpText("If a value looks wrong after switching units, check height and weight before using the result.")
         ),
 
         mainPanel(
           uiOutput("validation_notes"),
-          div(
-            class = "hero-result",
-            div(class = "hero-label", "Estimated maintenance calories"),
-            div(class = "hero-value", textOutput("maintenance_calories", inline = TRUE)),
-            div(class = "hero-subtext", "Use this as a starting point, then adjust based on body weight trends, training performance, hunger, and recovery.")
+          p(
+            class = "result-sentence",
+            "Your maintenance is about ",
+            strong(textOutput("maintenance_calories", inline = TRUE)),
+            " a day."
           ),
-          fluidRow(
-            column(
-              4,
-              div(
-                class = "macro-card",
-                div(class = "macro-label", "Protein"),
-                div(class = "macro-value", textOutput("protein_grams", inline = TRUE)),
-                div(class = "macro-subtext", textOutput("protein_percent", inline = TRUE))
-              )
-            ),
-            column(
-              4,
-              div(
-                class = "macro-card",
-                div(class = "macro-label", "Fat"),
-                div(class = "macro-value", textOutput("fat_grams", inline = TRUE)),
-                div(class = "macro-subtext", textOutput("fat_percent", inline = TRUE))
-              )
-            ),
-            column(
-              4,
-              div(
-                class = "macro-card",
-                div(class = "macro-label", "Carbohydrates"),
-                div(class = "macro-value", textOutput("carb_grams", inline = TRUE)),
-                div(class = "macro-subtext", textOutput("carb_percent", inline = TRUE))
-              )
-            )
+          p(
+            class = "result-note",
+            "That's a starting point. Adjust it based on body weight trends, training performance, hunger, and recovery."
           ),
-          fluidRow(
-            column(
-              6,
-              div(
-                class = "details-card",
-                h4("Calculation details"),
-                tableOutput("results_table")
-              )
-            ),
-            column(
-              6,
-              div(
-                class = "details-card",
-                h4("Macronutrient breakdown"),
-                plotOutput("macro_pie_chart", height = "330px"),
-                div(class = "chart-note", "This chart shows the percentage of your maintenance calories that comes from protein, fat, and carbohydrates.")
-              )
-            )
-          )
+          h4("Daily targets"),
+          tableOutput("macro_table"),
+          uiOutput("macro_bar"),
+          h4("Calculation details"),
+          tableOutput("results_table")
         )
       )
     )
@@ -577,96 +556,43 @@ server <- function(input, output, session) {
     )
   })
 
+  # Rounded to the nearest 50, since the result is an estimate.
   output$maintenance_calories <- renderText({
-    paste0(round(results()$maintenance_calories), " kcal/day")
+    calories <- round(results()$maintenance_calories / 50) * 50
+    glue("{format_number(calories)} calories")
   })
 
-  output$protein_grams <- renderText({
-    paste0(round(results()$protein_g), " g")
-  })
+  # One row per macronutrient. The small square matches its color in the bar.
+  output$macro_table <- renderTable({
+    r <- results()
+    tibble(
+      Macronutrient = glue("<span class='swatch' style='background-color:{macro_colors}'></span>{names(macro_colors)}"),
+      Grams = glue("{round(c(r$protein_g, r$fat_g, r$carb_g))} g"),
+      Calories = format_number(c(r$protein_kcal, r$fat_kcal, r$carb_kcal)),
+      Share = glue("{round(c(r$protein_pct, r$fat_pct, r$carb_pct))}%")
+    )
+  }, sanitize.text.function = identity, align = "lrrr", width = "100%")
 
-  output$protein_percent <- renderText({
-    paste0(round(results()$protein_pct), "% of calories")
-  })
-
-  output$fat_grams <- renderText({
-    paste0(round(results()$fat_g), " g")
-  })
-
-  output$fat_percent <- renderText({
-    paste0(round(results()$fat_pct), "% of calories")
-  })
-
-  output$carb_grams <- renderText({
-    paste0(round(results()$carb_g), " g")
-  })
-
-  output$carb_percent <- renderText({
-    paste0(round(results()$carb_pct), "% of calories")
+  # A single stacked bar: each macronutrient's share of calories.
+  output$macro_bar <- renderUI({
+    r <- results()
+    shares <- c(r$protein_pct, r$fat_pct, r$carb_pct)
+    div(
+      class = "macro-bar",
+      role = "img",
+      `aria-label` = glue(
+        "Protein {round(shares[1])}%, fat {round(shares[2])}%, ",
+        "carbohydrates {round(shares[3])}% of calories"
+      ),
+      map2(shares, macro_colors, \(share, color) {
+        span(style = glue("width: {share}%; background-color: {color};"))
+      })
+    )
   })
 
   output$results_table <- renderTable({
-    details <- results()$detail_table
-    names(details) <- c("Metric", "Value")
-    details
-  }, striped = TRUE, hover = TRUE, bordered = TRUE)
-
-  output$macro_pie_chart <- renderPlot({
-    current_results <- results()
-
-    values <- c(
-      Protein = current_results$protein_kcal,
-      Fat = current_results$fat_kcal,
-      Carbohydrates = current_results$carb_kcal
-    )
-
-    grams <- c(
-      Protein = round(current_results$protein_g),
-      Fat = round(current_results$fat_g),
-      Carbohydrates = round(current_results$carb_g)
-    )
-
-    slice_colors <- c(
-      Protein = "#111111",
-      Fat = "#8A8A8A",
-      Carbohydrates = "#D9D9D9"
-    )
-
-    label_colors <- c(
-      Protein = "#FFFFFF",
-      Fat = "#111111",
-      Carbohydrates = "#111111"
-    )
-
-    par(mar = c(1, 1, 2, 1), bg = "white")
-    pie(
-      x = values,
-      labels = rep("", length(values)),
-      col = slice_colors,
-      border = "white",
-      lwd = 2,
-      clockwise = TRUE,
-      init.angle = 90,
-      radius = 1,
-      main = ""
-    )
-
-    proportions <- values / sum(values)
-    midpoints <- cumsum(proportions) - proportions / 2
-    angles <- (90 - midpoints * 360) * pi / 180
-    label_radius <- 0.58
-
-    label_text <- paste0(names(values), "\n", grams, " g")
-
-    text(
-      x = label_radius * cos(angles),
-      y = label_radius * sin(angles),
-      labels = label_text,
-      cex = 0.95,
-      font = 2,
-      col = unname(label_colors[names(values)])
-    )
-  })
+    results()$detail_table
+  }, colnames = FALSE, align = "lr", width = "100%")
 }
 
 shinyApp(ui = ui, server = server)

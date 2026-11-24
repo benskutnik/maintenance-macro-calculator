@@ -1,0 +1,45 @@
+/* Styles for the maintenance calorie and macronutrient calculator.
+   app.R links this file in tags$head(). Colors follow the Ben Skutnik brand. */
+
+/* Page: paper ground, with each tab's content on one white sheet. */
+body { background-color: #F4F4F4; }
+h2 { font-size: 2rem; margin: 28px 0 18px; }
+.nav-tabs { border-bottom: 1px solid #8A8A8A; }
+.nav-tabs .nav-link { color: #6D2838; border: 1px solid transparent; }
+.nav-tabs .nav-link.active { background-color: #FFFFFF; border-color: #8A8A8A #8A8A8A #FFFFFF; color: #111111; }
+.tab-content { background-color: #FFFFFF; border: 1px solid #8A8A8A; border-top: 0; padding: 32px; }
+h4 { font-size: 1.1rem; }
+
+/* Sidebar and Start here sections: no boxes of their own. */
+.well { background-color: transparent; border: 0; box-shadow: none; padding: 0 24px 0 0; margin-bottom: 24px; }
+
+/* Inputs: filled boxes with a gray outline, like the PDF's log boxes. */
+.form-control, .form-select, .selectize-input { background-color: #F4F4F4 !important; border: 1px solid #8A8A8A; box-shadow: none; }
+.selectize-dropdown { border: 1px solid #8A8A8A; }
+
+/* Result: one sentence, then the targets table and its bar. */
+.result-sentence { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; max-width: 640px; }
+.result-note { color: #666666; margin-bottom: 32px; max-width: 620px; }
+.swatch { display: inline-block; width: 10px; height: 10px; margin-right: 10px; outline: 1px solid #8A8A8A; outline-offset: -1px; }
+.macro-bar { display: flex; height: 14px; margin: 4px 0 36px; }
+.macro-bar span { display: block; }
+
+/* Tables: rules only, no stripes or boxes. */
+.table { --bs-table-striped-bg: transparent; --bs-table-bg: transparent; }
+.table > :not(caption) > * > * { border-width: 0 0 1px 0; border-color: #E2E2E2; padding: 0.5rem 0.75rem 0.5rem 0; }
+.table > thead > tr > th { border-bottom: 1px solid #111111; color: #666666; font-weight: 700; }
+.table-bordered > :not(caption) > * { border-width: 0; }
+.table > :not(caption) > * > *:last-child { padding-right: 0; }
+
+.site-footer { margin: 40px 0 24px; text-align: center; font-size: 13px; }
+.site-footer a { display: inline-flex; align-items: center; gap: 8px; color: #666666; text-decoration: none; }
+.site-footer a:hover { color: #111111; }
+
+@media (max-width: 767px) {
+  h2 { font-size: 1.5rem; }
+  .tab-content { padding: 20px 16px; }
+  .well { padding: 0; }
+  .result-sentence { font-size: 1.6rem; }
+  #macro_table th:nth-child(3), #macro_table td:nth-child(3) { display: none; }
+  #macro_table td:first-child { white-space: nowrap; }
+}
