@@ -966,22 +966,19 @@
   },
   "files": {
     "app.R": {
-      "checksum": "7707e96327a6314c252dc1038cb6de71"
+      "checksum": "ebea51e86c4a63c80d2f7abb5dbcaf44"
     },
     "README.md": {
       "checksum": "eb61f965a819b23366f1bdf0cb9ace13"
     },
     "www/apple-touch-icon.png": {
-      "checksum": "3d33aaeb49c2bc6e7113603f6fa45843"
+      "checksum": "d65ad641c65924d1250cf10c2caabba9"
     },
-    "www/ben-skutnik-logo-light.svg": {
-      "checksum": "a4e9dc95fb693e78ef0cbcc2e0306aaf"
-    },
-    "www/ben-skutnik-logo.svg": {
-      "checksum": "b71bc8870e33b617493b821b2845c6e0"
+    "www/ben-skutnik-wordmark-oxblood.svg": {
+      "checksum": "96990f9b3b8262458f1660bd0aff30aa"
     },
     "www/favicon-48.png": {
-      "checksum": "f22b2ab991b36757247b956588126d9e"
+      "checksum": "8737cc3477baa833f5e83d3416e72579"
     }
   },
   "users": null
